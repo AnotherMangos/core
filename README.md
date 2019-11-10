@@ -8,6 +8,7 @@ Want to install CMaNGOS and run your own World of Warcraft server?  Just follow 
 4.  "just init"<br>
 5.  "just maps"<br>
 6.  "just run"<br>
+7.  "just cleanup"<br>
 7.  ???<br>
 8.  Profit<br>
 <br>
