@@ -5,8 +5,8 @@ JUSTFILE_LOCATION="https://gist.githubusercontent.com/CedricThomas/f8d4d13726cd7
 JUST_FOLDER="/usr/bin"
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
+    sudo "$0" "$@"
+    exit $?
 fi
 
 # Ensure just is installed
