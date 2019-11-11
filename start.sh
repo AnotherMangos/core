@@ -4,7 +4,7 @@
 JUSTFILE_LOCATION="https://gist.githubusercontent.com/CedricThomas/f8d4d13726cd74726dfb4655748742cb/raw/05d1042158c3e9581f54745c3f103ef58adae8e8/Justfile"
 JUST_FOLDER="/usr/bin"
 
-if [ "$EUID" -ne 0 ]
+if [ "$EUID" -ne 0 ]; then
     sudo "$0" "$@"
     exit $?
 fi
