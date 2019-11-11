@@ -1,6 +1,6 @@
 
 # Execute the whole setup process
-all: init maps
+all: init maps run
 
 # Initialize the repository
 init:
