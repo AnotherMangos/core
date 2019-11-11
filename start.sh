@@ -78,6 +78,15 @@ check_docker_version() {
         exit 1
     fi
 
+    DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
+    MIN_VERSION=1.24.0
+
+    vercomp $DOCKER_COMPOSE_VERSION $MIN_VERSION
+    if [ $? == 2 ]; then
+        echo "Error: docker-compose need to be at least in version $MIN_VERSION ($DOCKER_COMPOSE_VERSION < $MIN_VERSION)." >&2
+        exit 1
+    fi
+
 }
 
 # Ensure just is installed
