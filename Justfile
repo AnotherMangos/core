@@ -1,3 +1,4 @@
+
 # Execute the whole setup process
 all: init maps
 
