@@ -1,7 +1,104 @@
 #!/usr/bin/env bash
 
+# Version comparator (0 for same version, 1 for greater than, 2 for less than)
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+vercomp () {
+
+if [ "$EUID" -ne 0 ]; then
+    sudo "$0" "$@"
+    exit $?
+fi
+
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+
+}
+
+# Verify if used tools are present
+check_needed_tools() {
+
+    NEEDED_TOOLS="wget docker-compose"
+    for tool in $NEEDED_TOOLS; do
+
+        if ! [ -x "$(command -v $tool)" ]; then
+            echo "Error: $tool is not installed." >&2
+            exit 1
+        fi
+
+    done
+
+}
+
+# Verify docker and podman are up to date
+check_docker_version() {
+
+    if [ -x "$(command -v podman)" ]; then
+
+        DOCKER="podman"
+        DOCKER_VERSION=$(podman version --format '{{.Version}}' | cut -d"-" -f1)
+        MIN_VERSION=1.5
+
+
+    elif [ -x "$(command -v docker)" ]; then
+
+        DOCKER="docker"
+        DOCKER_VERSION=$(docker version --format '{{.Server.Version}}' | cut -d"-" -f1)
+        MIN_VERSION=18.0.0
+
+    else
+        echo "Error: you need to have either podman or docker installed." >&2
+        exit 1
+    fi
+
+    vercomp $DOCKER_VERSION $MIN_VERSION
+    if [ $? == 2 ]; then
+        echo "Error: $DOCKER need to be at least in version $MIN_VERSION ($DOCKER_VERSION < $MIN_VERSION)." >&2
+        exit 1
+    fi
+
+    DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
+    MIN_VERSION=1.24.0
+
+    vercomp $DOCKER_COMPOSE_VERSION $MIN_VERSION
+    if [ $? == 2 ]; then
+        echo "Error: docker-compose need to be at least in version $MIN_VERSION ($DOCKER_COMPOSE_VERSION < $MIN_VERSION)." >&2
+        exit 1
+    fi
+
+}
+
+# Ensure just is installed
+ensure_just() {
+
+    if ! [ -x "$(command -v just)" ]; then
+        # Install just
+        wget -q -O- https://japaric.github.io/trust/install.sh | sh -s -- --git casey/just --target x86_64-unknown-linux-musl --to $JUST_FOLDER
+    fi
+
+}
+
 # TODO change for the public Jusfile URL when this repository will be released
-JUSTFILE_LOCATION="https://gist.githubusercontent.com/CedricThomas/f8d4d13726cd74726dfb4655748742cb/raw/05d1042158c3e9581f54745c3f103ef58adae8e8/Justfile"
+JUSTFILE_LOCATION="https://gist.githubusercontent.com/CedricThomas/f8d4d13726cd74726dfb4655748742cb/raw/266cb16e89cf1b64700cf8ef5e59856b1220f7d5/Justfile"
 JUST_FOLDER="/usr/bin"
 
 if [ "$EUID" -ne 0 ]; then
@@ -9,19 +106,9 @@ if [ "$EUID" -ne 0 ]; then
     exit $?
 fi
 
-# Ensure just is installed
-if ! [ -x "$(command -v just)" ]; then
-
-    # Ensure curl is installed
-    if ! [ -x "$(command -v curl)" ]; then
-        echo 'Error: curl is not installed.' >&2
-        exit 1
-    fi
-
-    # Install just
-    curl -LSfs https://japaric.github.io/trust/install.sh | sh -s -- --git casey/just --target x86_64-unknown-linux-musl --to $JUST_FOLDER
-
-fi
+check_needed_tools
+check_docker_version
+ensure_just
 
 # Fetch the Justfile
-curl -LSfs $JUSTFILE_LOCATION -o ./Justfile
+wget -q -O ./Justfile $JUSTFILE_LOCATION
