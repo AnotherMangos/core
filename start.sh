@@ -3,12 +3,12 @@
 # Version comparator (0 for same version, 1 for greater than, 2 for less than)
 # https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
 vercomp () {
-
-if [ "$EUID" -ne 0 ]; then
-    sudo "$0" "$@"
-    exit $?
-fi
-
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
     # fill empty fields in ver1 with zeros
     for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
     do
