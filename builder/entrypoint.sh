@@ -144,6 +144,7 @@ function _load_extension () {
 }
 
 function _load_config () {
+    _load_build_path
     if [ ! -f "$BUILD_PATH/config" ]
     then
         echo "Configuration file not found. Please use the 'init' method before using this command !"
@@ -206,7 +207,6 @@ function compile () {
 
 # init the db following the current configuration
 function init-db () {
-    _load_build_path
     _load_config
     _wait_sql
     cd $BUILD_PATH && \
@@ -228,6 +228,28 @@ function init-db () {
     echo "Init DB error ! Look at the 'help' method or open an issue for more information."
 }
 
+# clone a repository in the build PATH
+function _clone () {
+    _load_build_path
+    cd $BUILD_PATH && \
+    git clone --no-checkout $1 tmp && \
+    mv tmp/.git . && \
+    rmdir tmp && \
+    git reset --hard HEAD &&\
+    cd - || \
+    exit 1
+}
+
+# remove the repository cloned in the build PATH
+function _clean_repo () {
+    _load_build_path
+    cd $BUILD_PATH && \
+    git checkout --orphan tmp &&\
+    git rm -rf . &&\
+    cd - || \
+    exit 1
+}
+
 function help () {
     case $1 in
         *)
@@ -236,6 +258,12 @@ function help () {
             ;;
     esac
     exit 0
+}
+
+function build-extractor () {
+    _clone https://github.com/AnotherMangos/extractor
+    just create ./bin/tools
+    _clean_repo
 }
 
 #

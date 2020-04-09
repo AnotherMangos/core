@@ -1,4 +1,4 @@
 
 # Create the docker container used to build the amangos projects
-create-builder:
+create:
     docker build -t amangos/builder .

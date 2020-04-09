@@ -25,9 +25,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
-RUN echo "[client]\nprotocol=tcp\n" > /etc/mysql/conf.d/protocol.cnf
+RUN echo "[client]\nprotocol=tcp\n" > /etc/mysql/conf.d/protocol.cnf && \
+    wget -q -O- https://japaric.github.io/trust/install.sh | sh -s -- --git casey/just --target x86_64-unknown-linux-musl --to /bin
+
 
 COPY ./entrypoint.sh /
-
 
 ENTRYPOINT ["/entrypoint.sh"]
