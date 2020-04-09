@@ -105,6 +105,7 @@ function _load_build_path () {
         echo "Invalid path: $BUILD_PATH"
         exit 1
     fi
+    BUILD_PATH=$(realpath $BUILD_PATH)
 }
 
 function _load_build_repository () {
@@ -144,7 +145,6 @@ function _load_extension () {
 }
 
 function _load_config () {
-    _load_build_path
     if [ ! -f "$BUILD_PATH/config" ]
     then
         echo "Configuration file not found. Please use the 'init' method before using this command !"
@@ -207,6 +207,7 @@ function compile () {
 
 # init the db following the current configuration
 function init-db () {
+    _load_build_path
     _load_config
     _wait_sql
     cd $BUILD_PATH && \
@@ -230,7 +231,6 @@ function init-db () {
 
 # clone a repository in the build PATH
 function _clone () {
-    _load_build_path
     cd $BUILD_PATH && \
     git clone --no-checkout $1 tmp && \
     mv tmp/.git . && \
@@ -242,7 +242,6 @@ function _clone () {
 
 # remove the repository cloned in the build PATH
 function _clean_repo () {
-    _load_build_path
     cd $BUILD_PATH && \
     git checkout --orphan tmp &&\
     git rm -rf . &&\
@@ -262,6 +261,7 @@ function help () {
 }
 
 function build-extractor () {
+    _load_build_path
     _clone https://github.com/AnotherMangos/extractor
 
     cd $BUILD_PATH && \
