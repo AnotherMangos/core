@@ -197,6 +197,7 @@ function compile () {
     exit 0
 }
 
+# init the db following the current configuration
 function init_db () {
     _load_build_path
     _load_config

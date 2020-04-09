@@ -4,6 +4,11 @@ ENV BOOST_ROOT="/boost_1_61_0"
 
 RUN apt-get update && \
     apt-get install -y python-software-properties software-properties-common && \
+    apt-get install -qqy \
+    apt-transport-https \
+    ca-certificates \
+    lxc \
+    iptables &&\
     add-apt-repository -y ppa:george-edison55/cmake-3.x && \
     apt-get update && \
     apt-get remove -y cmake cmake-data && \
@@ -16,6 +21,7 @@ RUN apt-get update && \
     cd $BOOST_ROOT && \
     ./bootstrap.sh && \
     (./b2 || true) && \
+    curl -sSL https://get.docker.com/ | sh &&\
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
