@@ -246,6 +246,7 @@ function _clean_repo () {
     cd $BUILD_PATH && \
     git checkout --orphan tmp &&\
     git rm -rf . &&\
+    rm -rf .git &&\
     cd - || \
     exit 1
 }
@@ -262,7 +263,10 @@ function help () {
 
 function build-extractor () {
     _clone https://github.com/AnotherMangos/extractor
+
+    cd $BUILD_PATH && \
     just create ./bin/tools
+
     _clean_repo
 }
 
