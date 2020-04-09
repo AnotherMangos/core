@@ -152,6 +152,12 @@ function _load_config () {
     . $BUILD_PATH/config
 }
 
+function _wait_sql() {
+    echo "Waiting database..."
+    while ! (echo "SELECT 1" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD > /dev/null 2> /dev/null); do sleep 1; done
+    echo "Database is available !"
+}
+
 function init () {
     _load_build_path
     _load_build_repository
@@ -171,9 +177,10 @@ function init () {
     echo 'EXTENSION="'$EXTENSION'"' > config && \
     echo 'DB_HOST="127.0.0.1"' >> config && \
     echo 'DB_PORT="3306"' >> config && \
-    echo 'DB_ROOT_PASSWORD="password"' >> config && \
+    echo 'USERNAME="root"' >> config && \
+    echo 'PASSWORD="password"' >> config && \
     echo 'REALM_HOST="127.0.0.1"' >> config && \
-    echo "Init complete !" || \
+    echo "Init complete ! You can now update the config file to match you configuration" || \
     echo "Init error ! Look at the 'help' method or open an issue for more information."
     exit 0
 }
@@ -201,19 +208,20 @@ function compile () {
 function init-db () {
     _load_build_path
     _load_config
+    _wait_sql
     cd $BUILD_PATH && \
     echo "[INIT DB]" && \
-    mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD < ./mangos/sql/create/db_create_mysql.sql && \
-    mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < ./mangos/sql/base/mangos.sql && \
+    mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD < ./mangos/sql/create/db_create_mysql.sql && \
+    mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < ./mangos/sql/base/mangos.sql && \
     for sql_file in $(ls ./mangos/sql/base/dbc/original_data/*.sql) ;
-        do mysql -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < $sql_file ;
+        do mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < $sql_file ;
     done && \
     for sql_file in $(ls ./mangos/sql/base/dbc/cmangos_fixes/*.sql) ;
-        do mysql -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < $sql_file ;
+        do mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < $sql_file ;
     done && \
-    mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"characters < ./mangos/sql/base/characters.sql && \
-    mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"realmd < ./mangos/sql/base/realmd.sql && \
-    echo "UPDATE realmlist SET address = '$REALM_HOST' WHERE id = 1;" | mysql -uroot -h $MYSQL_HOST -P $MYSQL_PORT -p$MYSQL_ROOT_PASSWORD "$EXTENSION"realmd && \
+    mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"characters < ./mangos/sql/base/characters.sql && \
+    mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"realmd < ./mangos/sql/base/realmd.sql && \
+    echo "UPDATE realmlist SET address = '$REALM_HOST' WHERE id = 1;" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"realmd && \
     cd ./db && \
     ./InstallFullDB.sh && \
     echo "Init DB success !" || \
