@@ -25,6 +25,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
+RUN echo "[client]\nprotocol=tcp\n" > /etc/mysql/conf.d/protocol.cnf
+
 COPY ./entrypoint.sh /
 
 

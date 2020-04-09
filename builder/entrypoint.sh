@@ -163,13 +163,13 @@ function init () {
     git clone $DB_REPOSITORY ./db && \
     echo "[CONFIG GENERATION]" && \
     cd ./db && \
-    rm ./InstallFullDB.config && \
+    rm -f ./InstallFullDB.config && \
     (./InstallFullDB.sh > dev/null  || true )&& \
     mv InstallFullDB.config base.config && \
     echo -e ". ./base.config\n. ../config" > InstallFullDB.config && \
     cd .. && \
-    echo 'EXTENSION="$EXTENSION"' >> config && \
-    echo 'DB_HOST="localhost"' >> config && \
+    echo 'EXTENSION="'$EXTENSION'"' > config && \
+    echo 'DB_HOST="127.0.0.1"' >> config && \
     echo 'DB_PORT="3306"' >> config && \
     echo 'DB_ROOT_PASSWORD="password"' >> config && \
     echo 'REALM_HOST="127.0.0.1"' >> config && \
@@ -198,22 +198,19 @@ function compile () {
 }
 
 # init the db following the current configuration
-function init_db () {
+function init-db () {
     _load_build_path
     _load_config
-    EXTENSION
-    DB_HOST
-    DB_PORT
-    DB_ROOT_PASSWORD
-    REALM_HOST
+    cd $BUILD_PATH && \
+    echo "[INIT DB]" && \
     mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD < ./mangos/sql/create/db_create_mysql.sql && \
     mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < ./mangos/sql/base/mangos.sql && \
     for sql_file in $(ls ./mangos/sql/base/dbc/original_data/*.sql) ;
         do mysql -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < $sql_file ;
-    done
+    done && \
     for sql_file in $(ls ./mangos/sql/base/dbc/cmangos_fixes/*.sql) ;
         do mysql -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"mangos < $sql_file ;
-    done
+    done && \
     mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"characters < ./mangos/sql/base/characters.sql && \
     mysql -uroot -h $DB_HOST -P $DB_PORT -p$DB_ROOT_PASSWORD "$EXTENSION"realmd < ./mangos/sql/base/realmd.sql && \
     echo "UPDATE realmlist SET address = '$REALM_HOST' WHERE id = 1;" | mysql -uroot -h $MYSQL_HOST -P $MYSQL_PORT -p$MYSQL_ROOT_PASSWORD "$EXTENSION"realmd && \
