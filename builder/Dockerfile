@@ -3,7 +3,7 @@ FROM ubuntu:14.04
 ENV BOOST_ROOT="/boost_1_61_0"
 
 RUN apt-get update && \
-    apt-get install -y python-software-properties software-properties-common && \
+    apt-get install -y realpath python-software-properties software-properties-common && \
     apt-get install -qqy \
     apt-transport-https \
     ca-certificates \
