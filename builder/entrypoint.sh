@@ -25,6 +25,12 @@ SCRIPT_VER="1.0"
 SCRIPT_OPTS=("(-p|--path):PATH" "(-r|--repo):REPO" "(-d|--db):DB" "(-e|--extension):EXT")
 SCRIPT_CATCHALL="false"
 
+# const vars
+EXTRACTOR_REPO_URL='https://github.com/AnotherMangos/extractor'
+MANGOSD_REPO_URL='https://github.com/AnotherMangos/mangosd'
+REALMD_REPO_URL='https://github.com/AnotherMangos/realmd'
+
+
 # Print Usage for CLI
 function _help () {
     echo -e "${SCRIPT_NAME}\n"
@@ -262,10 +268,11 @@ function help () {
 
 function build-extractor () {
     _load_build_path
-    _clone https://github.com/AnotherMangos/extractor
+    _load_config
+    _clone $EXTRACTOR_REPO_URL
 
     cd $BUILD_PATH && \
-    just create ./bin/tools
+    just create $EXTENSION ./bin/tools
 
     _clean_repo
 }
