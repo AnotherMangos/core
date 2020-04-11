@@ -182,6 +182,8 @@ function init () {
     echo -e ". ./base.config\n. ../config" > InstallFullDB.config && \
     cd .. && \
     echo 'EXTENSION="'$EXTENSION'"' > config && \
+    echo 'DB_REVISION="'$( git --git-dir ./db/.git rev-parse HEAD)'"' >> config && \
+    echo 'MANGOS_REVISION="'$( git --git-dir ./mangos/.git rev-parse HEAD)'"' >> config && \
     echo 'DB_HOST="127.0.0.1"' >> config && \
     echo 'DB_PORT="3306"' >> config && \
     echo 'USERNAME="root"' >> config && \
@@ -195,7 +197,13 @@ function init () {
 # Compile the several binaries
 function compile () {
     _load_build_path
+    _load_config
     cd $BUILD_PATH && \
+    echo "[CHECKOUT VERSION]" && \
+    cd mangos && \
+    git pull && \
+    git reset --hard $MANGOS_REVISION && \
+    cd .. && \
     echo "[COMPILATION]" && \
     mkdir -p ./build && \
     cd ./build && \
@@ -217,6 +225,11 @@ function init-db () {
     _load_config
     _wait_sql
     cd $BUILD_PATH && \
+    echo "[CHECKOUT VERSION]" && \
+    cd db && \
+    git pull && \
+    git reset --hard $DB_REVISION && \
+    cd .. && \
     echo "[INIT DB]" && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD < ./mangos/sql/create/db_create_mysql.sql && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < ./mangos/sql/base/mangos.sql && \
