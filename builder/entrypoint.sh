@@ -307,6 +307,22 @@ function build-mangosd () {
     rm -rf ./tmp
     _clean_repo
 }
+
+function build-realmd () {
+    _load_build_path
+    _load_config
+    _clone $REALMD_REPO_URL
+
+    cd $BUILD_PATH && \
+    mkdir ./tmp &&\
+    cp bin/realmd ./tmp/realmd &&\
+    cp etc/realmd.conf.dist ./tmp/realmd.conf &&\
+    just create $EXTENSION $MANGOS_REVISION ./tmp
+
+    rm -rf ./tmp
+    _clean_repo
+}
+
 #
 # User Implementation Ends
 # Do not modify the code below this point.
