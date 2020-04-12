@@ -232,6 +232,9 @@ function init-db () {
     cd .. && \
     echo "[INIT DB]" && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD < ./mangos/sql/create/db_create_mysql.sql && \
+    # temporary solution to host checking
+    echo "UPDATE mysql.user SET Host='%' WHERE Host='localhost' AND User='username';" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD &&\
+    echo "UPDATE mysql.db SET Host='%' WHERE Host='localhost' AND User='username';" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < ./mangos/sql/base/mangos.sql && \
     for sql_file in $(ls ./mangos/sql/base/dbc/original_data/*.sql) ;
         do mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"mangos < $sql_file ;
