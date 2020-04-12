@@ -290,6 +290,20 @@ function build-extractor () {
     _clean_repo
 }
 
+function build-mangosd () {
+    _load_build_path
+    _load_config
+    _clone $MANGOSD_REPO_URL
+
+    cd $BUILD_PATH && \
+    mkdir ./tmp &&\
+    cp bin/mangosd ./tmp/mangosd &&\
+    cp etc/mangosd.conf.dist ./tmp/mangosd.conf &&\
+    just create $EXTENSION $MANGOS_REVISION ./tmp
+
+    rm -rf ./tmp
+    _clean_repo
+}
 #
 # User Implementation Ends
 # Do not modify the code below this point.
