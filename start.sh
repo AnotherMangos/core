@@ -97,8 +97,7 @@ ensure_just() {
 
 }
 
-# TODO change for the public Jusfile URL when this repository will be released
-JUSTFILE_LOCATION="https://gist.githubusercontent.com/CedricThomas/f8d4d13726cd74726dfb4655748742cb/raw/266cb16e89cf1b64700cf8ef5e59856b1220f7d5/Justfile"
+JUSTFILE_LOCATION="https://raw.githubusercontent.com/AnotherMangos/core/master/Justfile"
 JUST_FOLDER="/usr/bin"
 
 if [ "$EUID" -ne 0 ]; then
