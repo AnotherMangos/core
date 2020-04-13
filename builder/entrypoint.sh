@@ -188,7 +188,7 @@ function init () {
     echo 'DB_PORT="3306"' >> config && \
     echo 'USERNAME="root"' >> config && \
     echo 'PASSWORD="password"' >> config && \
-    echo 'REALM_HOST="127.0.0.1"' >> config && \
+    echo 'MANGOSD_HOST="127.0.0.1"' >> config && \
     echo "Init complete ! You can now update the config file to match you configuration" || \
     echo "Init error ! Look at the 'help' method or open an issue for more information."
     exit 0
@@ -244,7 +244,7 @@ function init-db () {
     done && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"characters < ./mangos/sql/base/characters.sql && \
     mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"realmd < ./mangos/sql/base/realmd.sql && \
-    echo "UPDATE realmlist SET address = '$REALM_HOST' WHERE id = 1;" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"realmd && \
+    echo "UPDATE realmlist SET address = '$MANGOSD_HOST' WHERE id = 1;" | mysql -u$USERNAME -h $DB_HOST -P $DB_PORT -p$PASSWORD "$EXTENSION"realmd && \ # TODO FIX THE MANGOSD ADDRESSE
     cd ./db && \
     ./InstallFullDB.sh && \
     echo "Init DB success !" || \
